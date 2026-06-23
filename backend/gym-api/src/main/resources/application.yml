@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: gym-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/gymdb}
+    username: ${DB_USERNAME:gymadmin}
+    password: ${DB_PASSWORD:gymadmin}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+gymplatform:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-key-change-in-production-min-32-bytes!}
+    access-token-ttl-minutes: 15
+    refresh-token-ttl-days: 7
+
+logging:
+  level:
+    com.gymplatform: INFO

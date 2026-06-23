@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+gymplatform:
+  jwt:
+    secret: test-only-secret-key-not-for-production-use-32b
+    access-token-ttl-minutes: 15
+    refresh-token-ttl-days: 7

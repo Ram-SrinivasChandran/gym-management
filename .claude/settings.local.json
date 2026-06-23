@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo:*)",
+      "Bash(emulator -list-avds)",
+      "Read(//c/Users/Akash/.android//**)",
+      "Read(//c/Users/Akash/.android/avd//**)",
+      "Bash(/c/Users/Akash/AppData/Local/Android/Sdk/platform-tools/adb.exe devices:*)"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+# Backend (Maven)
+backend/**/target/
+
+# Mobile (React Native / Node)
+mobile/node_modules/
+mobile/android/app/build/
+mobile/ios/build/
+mobile/ios/Pods/
+mobile/.expo/
+mobile/coverage/
+
+# E2E (Playwright)
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
