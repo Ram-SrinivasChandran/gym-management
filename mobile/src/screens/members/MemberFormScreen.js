@@ -179,7 +179,7 @@ export default function MemberFormScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   form: { padding: 20 },
   input: { marginTop: 12, backgroundColor: '#FFFFFF' },
   row: { flexDirection: 'row', justifyContent: 'space-between' },

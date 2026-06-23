@@ -1,8 +1,9 @@
 export const brand = {
-  primary: '#2563EB',
-  secondary: '#10B981',
-  accent: '#F97316',
+  primary: '#DC2626',
+  secondary: '#171717',
+  accent: '#EF4444',
   background: '#F8FAFC',
+  dark: '#0A0A0A',
 };
 
 export const statusColors = {

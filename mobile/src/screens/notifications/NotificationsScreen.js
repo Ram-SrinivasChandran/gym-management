@@ -67,7 +67,7 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   form: { padding: 16 },
   input: { marginBottom: 12, backgroundColor: '#FFFFFF' },
   submitButton: { borderRadius: 10 },

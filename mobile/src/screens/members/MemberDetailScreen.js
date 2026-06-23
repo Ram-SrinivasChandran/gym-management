@@ -134,7 +134,7 @@ export default function MemberDetailScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center' },
   section: { padding: 16 },
   cardSpacing: { marginTop: 16 },

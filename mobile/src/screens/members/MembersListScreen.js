@@ -58,11 +58,11 @@ export default function MembersListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   searchWrap: { paddingHorizontal: 16, marginTop: -20 },
   listContent: { padding: 16, paddingBottom: 96 },
   card: { marginBottom: 12 },
   meta: { color: '#64748B', marginTop: 4 },
   centered: { textAlign: 'center', marginTop: 40 },
-  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#2563EB' },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#DC2626' },
 });

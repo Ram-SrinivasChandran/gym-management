@@ -78,7 +78,7 @@ export default function AttendanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   section: { padding: 16 },
   input: { marginBottom: 16, backgroundColor: '#FFFFFF' },
   card: { marginBottom: 12 },

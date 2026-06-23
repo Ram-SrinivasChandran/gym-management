@@ -36,7 +36,7 @@ export default function PaymentHistoryScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   centered: { textAlign: 'center', marginTop: 40 },
   listContent: { padding: 16 },
   card: { marginBottom: 12 },

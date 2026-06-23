@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { z } from 'zod';
-import GradientHeader from '../../components/GradientHeader';
 import { useLogin } from '../../features/auth/useAuth';
+
+const logoMark = require('../../../assets/logo-mark.png');
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -34,8 +35,8 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <GradientHeader title="Gym Management" subtitle="Sign in to manage your gym" />
       <View style={styles.form}>
+        <Image source={logoMark} style={styles.logo} resizeMode="contain" />
         <Controller
           control={control}
           name="email"
@@ -79,6 +80,8 @@ export default function LoginScreen() {
           loading={login.isPending}
           disabled={login.isPending}
           style={styles.submitButton}
+          buttonColor="#EF4444"
+          textColor="#FFFFFF"
           testID="login-submit-button"
         >
           Sign In
@@ -89,8 +92,9 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
-  form: { padding: 24 },
+  flex: { flex: 1 },
+  form: { flex: 1, padding: 24, justifyContent: 'center' },
+  logo: { width: 220, height: 150, alignSelf: 'center', marginBottom: 32, borderRadius: 16 },
   input: { marginTop: 16, backgroundColor: '#FFFFFF' },
   errorText: { color: '#EF4444', marginTop: 4, fontSize: 12 },
   submitButton: { marginTop: 24, borderRadius: 10 },

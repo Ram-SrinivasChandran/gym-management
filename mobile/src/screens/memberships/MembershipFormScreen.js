@@ -82,7 +82,7 @@ export default function MembershipFormScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   form: { padding: 20 },
   input: { marginTop: 12, backgroundColor: '#FFFFFF' },
   errorText: { color: '#EF4444', marginTop: 8, fontSize: 12 },

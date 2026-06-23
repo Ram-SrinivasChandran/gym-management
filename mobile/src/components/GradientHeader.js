@@ -1,11 +1,18 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { brand } from '../theme/colors';
 
-export default function GradientHeader({ title, subtitle, right }) {
+const logoMark = require('../../assets/logo-mark.png');
+
+export default function GradientHeader({ title, subtitle, right, logoSize = 44 }) {
   return (
-    <LinearGradient colors={[brand.primary, '#1D4ED8']} style={styles.container}>
+    <LinearGradient colors={[brand.primary, brand.dark]} style={styles.container}>
       <View style={styles.row}>
+        <Image
+          source={logoMark}
+          style={[styles.logo, { width: logoSize, height: logoSize }]}
+          resizeMode="contain"
+        />
         <View style={styles.textBlock}>
           <Text style={styles.title}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
@@ -26,8 +33,13 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+  },
+  logo: {
+    borderRadius: 10,
+    backgroundColor: brand.dark,
+    marginRight: 12,
   },
   textBlock: {
     flexShrink: 1,

@@ -80,7 +80,7 @@ export default function PaymentFormScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   form: { padding: 20 },
   input: { marginTop: 4, marginBottom: 16, backgroundColor: '#FFFFFF' },
   label: { color: '#64748B', marginBottom: 8 },

@@ -55,6 +55,6 @@ export default function MoreScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   logoutText: { color: '#EF4444' },
 });

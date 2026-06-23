@@ -5,7 +5,21 @@
       "Bash(emulator -list-avds)",
       "Read(//c/Users/Akash/.android//**)",
       "Read(//c/Users/Akash/.android/avd//**)",
-      "Bash(/c/Users/Akash/AppData/Local/Android/Sdk/platform-tools/adb.exe devices:*)"
+      "Bash(/c/Users/Akash/AppData/Local/Android/Sdk/platform-tools/adb.exe devices:*)",
+      "Bash(npm install *)",
+      "Bash(docker compose *)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8082)",
+      "Bash(curl -s -X POST http://localhost:8090/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"superadmin@platform.local\",\"password\":\"SuperAdmin123!\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -X POST http://localhost:8090/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"superadmin@platform.local\",\"password\":\"SuperAdmin123!\"}')",
+      "Bash(curl -s -X POST http://localhost:8090/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@demogym.local\",\"password\":\"GymAdmin123!\"}')",
+      "Read(//home/ram/.claude/projects/-home-ram-gym-gym-management/memory/**)",
+      "Bash(echo \"- [Run setup & ports]\\(run-setup-ports.md\\) — non-default ports \\(pg 5433, backend 8090, metro 8082\\), emulator API 10.0.2.2, gym-admin vs super-admin login\")",
+      "Bash(echo \"=== temp logo path? ===\"; ls -la \"/temp/readonly/\" 2>/dev/null || echo \"no /temp/readonly\" *)",
+      "Read(//temp/**)",
+      "Bash(python3 -c \"import PIL; print\\('Pillow', PIL.__version__\\)\")",
+      "Bash(node -e \"require\\('sharp'\\); console.log\\('sharp ok'\\)\")",
+      "Bash(python3 -)",
+      "Bash(echo \"exit:$?\")"
     ]
   }
 }

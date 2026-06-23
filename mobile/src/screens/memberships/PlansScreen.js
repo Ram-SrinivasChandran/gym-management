@@ -107,7 +107,7 @@ export default function PlansScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   form: { padding: 16 },
   input: { marginTop: 12, backgroundColor: '#FFFFFF' },
   segmented: { marginTop: 12 },

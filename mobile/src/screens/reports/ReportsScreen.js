@@ -68,10 +68,10 @@ export default function ReportsScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#F8FAFC' },
+  flex: { flex: 1 },
   section: { padding: 16 },
   cardSpacing: { marginTop: 16 },
-  bigValue: { fontSize: 28, fontWeight: '700', marginTop: 8, color: '#2563EB' },
+  bigValue: { fontSize: 28, fontWeight: '700', marginTop: 8, color: '#DC2626' },
   meta: { color: '#64748B', marginTop: 4 },
   exportNote: { marginTop: 16, color: '#94A3B8', fontSize: 12, textAlign: 'center' },
 });
