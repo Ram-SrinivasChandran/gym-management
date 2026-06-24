@@ -1,0 +1,30 @@
+# Render Blueprint for the gym backend. Connect this repo in Render (New > Blueprint) and it
+# provisions the service from here. Secrets (DB creds) are marked sync:false — Render prompts
+# you to enter them in the dashboard so they never live in the repo.
+services:
+  - type: web
+    name: gym-api
+    runtime: docker
+    plan: free
+    region: singapore # closest Render region to the Supabase ap-south-1 (Mumbai) database
+    dockerfilePath: ./backend/gym-api/Dockerfile
+    dockerContext: ./backend/gym-api
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      # Supabase session-pooler connection (same values as backend/gym-api/.env.supabase).
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Public project URL — used to validate Supabase access tokens via JWKS.
+      - key: SUPABASE_URL
+        value: https://mzijhzfibysljfpsfurp.supabase.co
+      # Legacy self-issued-JWT secret (vestigial now that auth is Supabase) — generated so it is set.
+      - key: JWT_SECRET
+        generateValue: true
+      # Constrain the JVM heap to fit Render's free 512 MB instance.
+      - key: JAVA_OPTS
+        value: -XX:MaxRAMPercentage=70.0

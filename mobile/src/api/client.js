@@ -1,36 +1,22 @@
 import axios from 'axios';
 import { API_BASE_URL } from './config';
-import { useSessionStore } from '../store/sessionStore';
+import { supabase } from './supabase';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
 });
 
-apiClient.interceptors.request.use((config) => {
-  const { accessToken } = useSessionStore.getState();
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+// Attach the current Supabase access token to every request. getSession() returns the
+// cached session (Supabase refreshes it in the background when autoRefreshToken is on).
+apiClient.interceptors.request.use(async (config) => {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
-
-let refreshPromise = null;
-
-async function refreshAccessToken() {
-  const { refreshToken, setSession, clearSession } = useSessionStore.getState();
-  if (!refreshToken) {
-    await clearSession();
-    throw new Error('No refresh token available');
-  }
-
-  const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
-  await setSession({
-    accessToken: response.data.accessToken,
-    refreshToken: response.data.refreshToken,
-  });
-  return response.data.accessToken;
-}
 
 apiClient.interceptors.response.use(
   (response) => response,
@@ -43,17 +29,15 @@ apiClient.interceptors.response.use(
     }
     originalRequest._retry = true;
 
-    try {
-      refreshPromise = refreshPromise ?? refreshAccessToken();
-      const newAccessToken = await refreshPromise;
-      refreshPromise = null;
-
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-      return apiClient(originalRequest);
-    } catch (refreshError) {
-      refreshPromise = null;
-      await useSessionStore.getState().clearSession();
-      return Promise.reject(refreshError);
+    // Force a token refresh through Supabase, then retry once. If refresh fails, sign out.
+    const { data, error: refreshError } = await supabase.auth.refreshSession();
+    const newAccessToken = data?.session?.access_token;
+    if (refreshError || !newAccessToken) {
+      await supabase.auth.signOut();
+      return Promise.reject(refreshError ?? error);
     }
+
+    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+    return apiClient(originalRequest);
   }
 );

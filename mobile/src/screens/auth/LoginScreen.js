@@ -5,6 +5,7 @@ import { Image, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-n
 import { Button, Text, TextInput } from 'react-native-paper';
 import AppTextInput from '../../components/AppTextInput';
 import { z } from 'zod';
+import { sendPasswordReset } from '../../features/auth/api';
 import { useLogin } from '../../features/auth/useAuth';
 
 const logoMark = require('../../../assets/logo-mark.png');
@@ -17,12 +18,14 @@ const loginSchema = z.object({
 export default function LoginScreen() {
   const [serverError, setServerError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotHelp, setShowForgotHelp] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState(null);
+  const [sendingReset, setSendingReset] = useState(false);
   const login = useLogin();
 
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -34,6 +37,24 @@ export default function LoginScreen() {
     login.mutate(values, {
       onError: () => setServerError('Invalid email or password'),
     });
+  };
+
+  const onForgotPassword = async () => {
+    const email = getValues('email');
+    if (!email || !z.string().email().safeParse(email).success) {
+      setForgotMsg('Enter your email above first, then tap Forgot Password.');
+      return;
+    }
+    setSendingReset(true);
+    setForgotMsg(null);
+    try {
+      await sendPasswordReset(email);
+      setForgotMsg(`Password reset email sent to ${email}. Check your inbox.`);
+    } catch {
+      setForgotMsg('Could not send the reset email. Please try again.');
+    } finally {
+      setSendingReset(false);
+    }
   };
 
   return (
@@ -100,16 +121,18 @@ export default function LoginScreen() {
 
         <Button
           mode="text"
-          onPress={() => setShowForgotHelp((prev) => !prev)}
+          onPress={onForgotPassword}
+          loading={sendingReset}
+          disabled={sendingReset}
           textColor="#DC2626"
           style={styles.forgotButton}
           testID="forgot-password-button"
         >
           Forgot Password?
         </Button>
-        {showForgotHelp ? (
+        {forgotMsg ? (
           <Text style={styles.forgotHelp} testID="forgot-password-help">
-            Please contact your gym admin to reset your password.
+            {forgotMsg}
           </Text>
         ) : null}
       </View>

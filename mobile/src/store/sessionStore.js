@@ -1,42 +1,20 @@
 import { create } from 'zustand';
-import { deleteItemAsync, getItemAsync, setItemAsync } from './secureStorage';
+import { supabase } from '../api/supabase';
 
-const ACCESS_TOKEN_KEY = 'gym.accessToken';
-const REFRESH_TOKEN_KEY = 'gym.refreshToken';
-
+// Auth is owned by Supabase. The store mirrors the current Supabase access token so the
+// navigator can gate on it; Supabase persists/refreshes the session itself (AsyncStorage).
 export const useSessionStore = create((set, get) => ({
   accessToken: null,
-  refreshToken: null,
-  user: null,
   hydrated: false,
 
   hydrate: async () => {
-    const [accessToken, refreshToken] = await Promise.all([
-      getItemAsync(ACCESS_TOKEN_KEY),
-      getItemAsync(REFRESH_TOKEN_KEY),
-    ]);
-    set({ accessToken, refreshToken, hydrated: true });
-  },
+    const { data } = await supabase.auth.getSession();
+    set({ accessToken: data.session?.access_token ?? null, hydrated: true });
 
-  setSession: async ({ accessToken, refreshToken, user }) => {
-    await Promise.all([
-      setItemAsync(ACCESS_TOKEN_KEY, accessToken),
-      setItemAsync(REFRESH_TOKEN_KEY, refreshToken),
-    ]);
-    set({ accessToken, refreshToken, user: user ?? get().user });
-  },
-
-  setAccessToken: async (accessToken) => {
-    await setItemAsync(ACCESS_TOKEN_KEY, accessToken);
-    set({ accessToken });
-  },
-
-  clearSession: async () => {
-    await Promise.all([
-      deleteItemAsync(ACCESS_TOKEN_KEY),
-      deleteItemAsync(REFRESH_TOKEN_KEY),
-    ]);
-    set({ accessToken: null, refreshToken: null, user: null });
+    // Keep the token in sync on sign-in, sign-out, and silent token refreshes.
+    supabase.auth.onAuthStateChange((_event, session) => {
+      set({ accessToken: session?.access_token ?? null });
+    });
   },
 
   isAuthenticated: () => Boolean(get().accessToken),

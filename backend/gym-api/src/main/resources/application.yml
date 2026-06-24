@@ -18,7 +18,8 @@ spring:
     baseline-on-migrate: true
 
 server:
-  port: ${SERVER_PORT:8080}
+  # Render (and most PaaS) inject the port to bind via $PORT; fall back to SERVER_PORT then 8080 locally.
+  port: ${PORT:${SERVER_PORT:8080}}
 
 springdoc:
   swagger-ui:
@@ -41,6 +42,15 @@ gymplatform:
     secret: ${JWT_SECRET:dev-only-secret-key-change-in-production-min-32-bytes!}
     access-token-ttl-minutes: 15
     refresh-token-ttl-days: 7
+
+# Supabase Auth: the backend validates Supabase-issued access tokens (signed by Supabase)
+# against the project's JWKS endpoint. SUPABASE_URL is the project URL, e.g.
+# https://mzijhzfibysljfpsfurp.supabase.co
+supabase:
+  url: ${SUPABASE_URL:https://mzijhzfibysljfpsfurp.supabase.co}
+  jwt:
+    issuer: ${supabase.url}/auth/v1
+    jwk-set-uri: ${supabase.url}/auth/v1/.well-known/jwks.json
 
 logging:
   level:

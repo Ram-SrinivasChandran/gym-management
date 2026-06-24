@@ -2,6 +2,7 @@ package com.gymplatform.config;
 
 import com.gymplatform.common.security.JwtAuthenticationFilter;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,6 +33,27 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
+    }
+
+    /**
+     * Validates Supabase-issued access tokens against the project's JWKS endpoint
+     * (asymmetric signing keys) and checks the issuer/expiry. The backend no longer
+     * issues its own tokens — Supabase Auth does.
+     */
+    @Bean
+    public JwtDecoder supabaseJwtDecoder(
+            @Value("${supabase.jwt.jwk-set-uri}") String jwkSetUri,
+            @Value("${supabase.jwt.issuer}") String issuer) {
+        // Supabase signs access tokens with ES256 (ECC P-256). The decoder defaults to RS256
+        // only, so ES256 must be declared explicitly; RS256 is also allowed in case the
+        // project's signing key is later rotated to an RSA key.
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                .jwsAlgorithm(SignatureAlgorithm.ES256)
+                .jwsAlgorithm(SignatureAlgorithm.RS256)
+                .build();
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuer);
+        decoder.setJwtValidator(withIssuer);
+        return decoder;
     }
 
     @Bean

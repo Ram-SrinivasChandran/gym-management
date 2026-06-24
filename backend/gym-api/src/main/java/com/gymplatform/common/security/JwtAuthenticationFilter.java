@@ -2,8 +2,6 @@ package com.gymplatform.common.security;
 
 import com.gymplatform.common.tenancy.TenantContext;
 import com.gymplatform.common.tenancy.TenantContextHolder;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,19 +11,30 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * Authenticates each request from the Supabase access token in the Authorization header.
+ * The token is verified against Supabase's JWKS (see {@code supabaseJwtDecoder}); the
+ * {@code email} claim is then used to look up the local domain user, which supplies the
+ * gym/branch/role (tenant context). Supabase owns identity & passwords; this app owns
+ * tenancy & authorization.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtDecoder jwtDecoder;
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
-        this.jwtService = jwtService;
+    public JwtAuthenticationFilter(JwtDecoder jwtDecoder, UserDetailsService userDetailsService) {
+        this.jwtDecoder = jwtDecoder;
         this.userDetailsService = userDetailsService;
     }
 
@@ -48,8 +57,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            Claims claims = jwtService.parseClaims(token);
-            String email = claims.get("email", String.class);
+            Jwt jwt = jwtDecoder.decode(token);
+            String email = jwt.getClaimAsString("email");
+            if (!StringUtils.hasText(email)) {
+                return;
+            }
             UserPrincipal principal = (UserPrincipal) userDetailsService.loadUserByUsername(email);
 
             var authToken = new UsernamePasswordAuthenticationToken(
@@ -63,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     principal.getBranchId(),
                     principal.getRoleCode()
             ));
-        } catch (JwtException | IllegalArgumentException ex) {
+        } catch (JwtException | UsernameNotFoundException | IllegalArgumentException ex) {
             SecurityContextHolder.clearContext();
         }
     }
