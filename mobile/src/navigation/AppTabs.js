@@ -2,7 +2,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import MembersStack from './MembersStack';
-import AttendanceScreen from '../screens/attendance/AttendanceScreen';
 import MoreStack from './MoreStack';
 import { brand } from '../theme/colors';
 
@@ -34,11 +33,6 @@ export default function AppTabs() {
         name="Members"
         component={MembersStack}
         options={{ tabBarIcon: tabIcon('account-group-outline') }}
-      />
-      <Tab.Screen
-        name="Attendance"
-        component={AttendanceScreen}
-        options={{ tabBarIcon: tabIcon('qrcode-scan') }}
       />
       <Tab.Screen name="More" component={MoreStack} options={{ tabBarIcon: tabIcon('dots-horizontal') }} />
     </Tab.Navigator>

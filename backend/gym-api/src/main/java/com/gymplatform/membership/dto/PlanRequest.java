@@ -8,6 +8,7 @@ public record PlanRequest(
         @NotBlank @Pattern(regexp = "MONTHLY|QUARTERLY|HALF_YEARLY|ANNUAL|CUSTOM") String planType,
         @NotNull @Positive Integer durationDays,
         @NotNull @DecimalMin("0.0") BigDecimal price,
-        String benefits
+        String benefits,
+        @DecimalMin("0.0") BigDecimal discountAmount
 ) {
 }

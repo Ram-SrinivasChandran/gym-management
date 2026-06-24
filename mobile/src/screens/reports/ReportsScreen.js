@@ -5,6 +5,7 @@ import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import { apiClient } from '../../api/client';
 import { useQuery } from '@tanstack/react-query';
+import { text } from '../../theme/colors';
 import { formatCurrency } from '../../utils/format';
 
 function monthRange() {
@@ -36,7 +37,7 @@ export default function ReportsScreen() {
           <ActivityIndicator size="large" />
         ) : (
           <GlassCard>
-            <Text variant="titleMedium">Revenue (this month)</Text>
+            <Text variant="titleMedium" style={styles.cardTitle}>Revenue (this month)</Text>
             <Text style={styles.bigValue} testID="revenue-total-value">
               {formatCurrency(revenue?.totalRevenue)}
             </Text>
@@ -50,7 +51,7 @@ export default function ReportsScreen() {
         )}
 
         <GlassCard style={styles.cardSpacing}>
-          <Text variant="titleMedium">Memberships</Text>
+          <Text variant="titleMedium" style={styles.cardTitle}>Memberships</Text>
           <Text style={styles.meta}>Total: {membership?.totalMemberships ?? 0}</Text>
           {Object.entries(membership?.countByStatus ?? {}).map(([status, count]) => (
             <Text key={status} style={styles.meta}>
@@ -71,7 +72,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   section: { padding: 16 },
   cardSpacing: { marginTop: 16 },
-  bigValue: { fontSize: 28, fontWeight: '700', marginTop: 8, color: '#DC2626' },
-  meta: { color: '#64748B', marginTop: 4 },
+  cardTitle: { color: text.primary, fontWeight: '700' },
+  bigValue: { fontSize: 28, fontWeight: '700', marginTop: 8, color: text.title },
+  meta: { color: text.muted, marginTop: 4 },
   exportNote: { marginTop: 16, color: '#94A3B8', fontSize: 12, textAlign: 'center' },
 });

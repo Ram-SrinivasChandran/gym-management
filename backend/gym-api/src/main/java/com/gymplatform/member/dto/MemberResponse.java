@@ -10,6 +10,7 @@ public record MemberResponse(
         UUID gymId,
         UUID branchId,
         String memberCode,
+        String admissionNumber,
         String fullName,
         String phone,
         String email,

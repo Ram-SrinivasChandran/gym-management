@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, SegmentedButtons, Text, TextInput } from 'react-native-paper';
+import { Button, SegmentedButtons, Text } from 'react-native-paper';
+import AppTextInput from '../../components/AppTextInput';
 import GradientHeader from '../../components/GradientHeader';
 import { useRecordPayment } from '../../features/payments/usePayments';
 
@@ -47,7 +48,7 @@ export default function PaymentFormScreen({ route, navigation }) {
     <View style={styles.flex}>
       <GradientHeader title="Record Payment" subtitle="Manual entry — cash, card, UPI, or transfer" />
       <View style={styles.form}>
-        <TextInput
+        <AppTextInput
           label="Amount"
           keyboardType="numeric"
           value={amount}

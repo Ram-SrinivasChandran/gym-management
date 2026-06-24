@@ -39,6 +39,9 @@ public class Member {
     @Column(name = "member_code", nullable = false, length = 30)
     private String memberCode;
 
+    @Column(name = "admission_number", length = 30)
+    private String admissionNumber;
+
     @Column(name = "full_name", nullable = false, length = 150)
     private String fullName;
 

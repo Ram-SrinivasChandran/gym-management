@@ -121,7 +121,7 @@ class GymOnboardingIT {
         gymAdminHeaders.setBearerAuth(gymAdminToken);
 
         // 5. gym admin creates a membership plan
-        var planRequest = new PlanRequest("Monthly Basic", "MONTHLY", 30, BigDecimal.valueOf(49.99), "Gym access");
+        var planRequest = new PlanRequest("Monthly Basic", "MONTHLY", 30, BigDecimal.valueOf(49.99), "Gym access", BigDecimal.valueOf(5.00));
         var planResp = restTemplate.postForEntity(
                 url("/api/v1/membership-plans"), new HttpEntity<>(planRequest, gymAdminHeaders), String.class);
         assertThat(planResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);

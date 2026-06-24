@@ -3,11 +3,10 @@ import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import StatusBadge from '../../components/StatusBadge';
+import { text } from '../../theme/colors';
 import { useMember } from '../../features/members/useMembers';
 import { useMembershipHistory } from '../../features/memberships/useMemberships';
 import { useDueStatus } from '../../features/payments/usePayments';
-import { useCheckIn, useCheckOut } from '../../features/attendance/useAttendance';
-import { useToastStore } from '../../store/toastStore';
 import { formatCurrency, formatDate } from '../../utils/format';
 
 export default function MemberDetailScreen({ route, navigation }) {
@@ -16,26 +15,6 @@ export default function MemberDetailScreen({ route, navigation }) {
   const { data: history } = useMembershipHistory(memberId);
   const currentMembership = history?.[0];
   const { data: due } = useDueStatus(currentMembership?.id);
-  const checkInMutation = useCheckIn();
-  const checkOutMutation = useCheckOut();
-  const showToast = useToastStore((state) => state.showToast);
-
-  const handleCheckIn = () => {
-    checkInMutation.mutate(
-      { memberId, method: 'MANUAL' },
-      {
-        onSuccess: () => showToast('Checked in'),
-        onError: (error) => showToast(`Check-in failed: ${error.response?.data?.message ?? 'Please try again.'}`),
-      }
-    );
-  };
-
-  const handleCheckOut = () => {
-    checkOutMutation.mutate(memberId, {
-      onSuccess: () => showToast('Checked out'),
-      onError: (error) => showToast(`Check-out failed: ${error.response?.data?.message ?? 'Please try again.'}`),
-    });
-  };
 
   if (isLoading || !member) {
     return <ActivityIndicator style={styles.centered} size="large" />;
@@ -47,7 +26,8 @@ export default function MemberDetailScreen({ route, navigation }) {
 
       <View style={styles.section}>
         <GlassCard>
-          <Text variant="titleMedium">Profile</Text>
+          <Text variant="titleMedium" style={styles.cardTitle}>Profile</Text>
+          <Text style={styles.detailRow}>Admission No: {member.admissionNumber ?? '-'}</Text>
           <Text style={styles.detailRow}>Email: {member.email ?? '-'}</Text>
           <Text style={styles.detailRow}>Gender: {member.gender ?? '-'}</Text>
           <Text style={styles.detailRow}>
@@ -58,7 +38,7 @@ export default function MemberDetailScreen({ route, navigation }) {
         </GlassCard>
 
         <GlassCard style={styles.cardSpacing}>
-          <Text variant="titleMedium">Membership</Text>
+          <Text variant="titleMedium" style={styles.cardTitle}>Membership</Text>
           {currentMembership ? (
             <>
               <View style={styles.badgeRow} testID="membership-status-badge">
@@ -104,30 +84,6 @@ export default function MemberDetailScreen({ route, navigation }) {
             </>
           )}
         </GlassCard>
-
-        <GlassCard style={styles.cardSpacing}>
-          <Text variant="titleMedium">Attendance</Text>
-          <View style={styles.attendanceRow}>
-            <Button
-              mode="contained"
-              style={styles.halfButton}
-              loading={checkInMutation.isPending}
-              onPress={handleCheckIn}
-              testID="detail-check-in-button"
-            >
-              Check In
-            </Button>
-            <Button
-              mode="outlined"
-              style={styles.halfButton}
-              loading={checkOutMutation.isPending}
-              onPress={handleCheckOut}
-              testID="detail-check-out-button"
-            >
-              Check Out
-            </Button>
-          </View>
-        </GlassCard>
       </View>
     </ScrollView>
   );
@@ -138,9 +94,8 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center' },
   section: { padding: 16 },
   cardSpacing: { marginTop: 16 },
-  detailRow: { marginTop: 6, color: '#334155' },
+  cardTitle: { color: text.title, fontWeight: '700' },
+  detailRow: { marginTop: 6, color: text.secondary },
   badgeRow: { marginTop: 8, marginBottom: 4 },
   actionButton: { marginTop: 12, borderRadius: 10 },
-  attendanceRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
-  halfButton: { flexBasis: '48%' },
 });

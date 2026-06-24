@@ -56,7 +56,6 @@ export default function DashboardScreen() {
           color={statusColors.ACTIVE}
         />
         <StatCard label="Payments (Month)" value={data.paymentCountThisMonth} />
-        <StatCard label="Attendance Today" value={data.attendanceTodayCount} />
       </View>
     </ScrollView>
   );

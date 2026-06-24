@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record UpdateMemberRequest(
+        @Size(max = 30) String admissionNumber,
         @Size(max = 150) String fullName,
         @Size(max = 20) String phone,
         @Email String email,

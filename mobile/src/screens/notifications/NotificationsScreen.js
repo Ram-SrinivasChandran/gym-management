@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import AppTextInput from '../../components/AppTextInput';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import { apiClient } from '../../api/client';
+import { text } from '../../theme/colors';
 import { formatDate } from '../../utils/format';
 
 export default function NotificationsScreen() {
@@ -32,7 +34,7 @@ export default function NotificationsScreen() {
         <View>
           <GradientHeader title="Notifications" subtitle="Send promos, view delivery log" />
           <View style={styles.form}>
-            <TextInput
+            <AppTextInput
               label="Broadcast message"
               value={message}
               onChangeText={setMessage}
@@ -55,7 +57,7 @@ export default function NotificationsScreen() {
       contentContainerStyle={styles.listContent}
       renderItem={({ item }) => (
         <GlassCard style={styles.card}>
-          <Text variant="titleMedium">{item.type}</Text>
+          <Text variant="titleMedium" style={styles.cardTitle}>{item.type}</Text>
           <Text style={styles.meta}>
             {item.channel} · {item.status}
           </Text>
@@ -73,5 +75,6 @@ const styles = StyleSheet.create({
   submitButton: { borderRadius: 10 },
   listContent: { paddingHorizontal: 16, paddingBottom: 24 },
   card: { marginBottom: 12 },
-  meta: { color: '#64748B', marginTop: 4 },
+  cardTitle: { color: text.title, fontWeight: '700' },
+  meta: { color: text.muted, marginTop: 4 },
 });

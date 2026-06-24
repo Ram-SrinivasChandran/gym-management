@@ -52,4 +52,4 @@ export const navDarkTheme = {
   },
 };
 
-export { brand, statusColors } from './colors';
+export { brand, statusColors, text } from './colors';

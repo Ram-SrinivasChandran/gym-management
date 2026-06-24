@@ -40,6 +40,7 @@ public class MemberService {
                 .gymId(gymId)
                 .branchId(request.branchId())
                 .memberCode(generateMemberCode(gymId))
+                .admissionNumber(request.admissionNumber())
                 .fullName(request.fullName())
                 .phone(request.phone())
                 .email(request.email())
@@ -58,6 +59,9 @@ public class MemberService {
     public MemberResponse updateMember(UUID memberId, UpdateMemberRequest request) {
         Member member = findOwnedMemberOrThrow(memberId);
 
+        if (StringUtils.hasText(request.admissionNumber())) {
+            member.setAdmissionNumber(request.admissionNumber());
+        }
         if (StringUtils.hasText(request.fullName())) {
             member.setFullName(request.fullName());
         }

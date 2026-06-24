@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record CreateMemberRequest(
         @NotNull UUID branchId,
+        @NotBlank @Size(max = 30) String admissionNumber,
         @NotBlank @Size(max = 150) String fullName,
         @NotBlank @Size(max = 20) String phone,
         @Email String email,

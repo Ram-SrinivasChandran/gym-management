@@ -52,6 +52,10 @@ public class Membership {
     private BigDecimal totalPrice;
 
     @Builder.Default
+    @Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Builder.Default
     @Column(nullable = false, length = 20)
     private String status = ACTIVE;
 

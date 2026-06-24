@@ -3,6 +3,7 @@ import { ActivityIndicator, Text } from 'react-native-paper';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import { usePaymentHistory } from '../../features/payments/usePayments';
+import { text } from '../../theme/colors';
 import { formatCurrency, formatDate } from '../../utils/format';
 
 export default function PaymentHistoryScreen({ route }) {
@@ -21,7 +22,7 @@ export default function PaymentHistoryScreen({ route }) {
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
             <GlassCard style={styles.card}>
-              <Text variant="titleMedium">{formatCurrency(item.amount)}</Text>
+              <Text variant="titleMedium" style={styles.cardTitle}>{formatCurrency(item.amount)}</Text>
               <Text style={styles.meta}>
                 {item.paymentType} · {item.paymentMethod} · {item.receiptNumber}
               </Text>
@@ -40,5 +41,6 @@ const styles = StyleSheet.create({
   centered: { textAlign: 'center', marginTop: 40 },
   listContent: { padding: 16 },
   card: { marginBottom: 12 },
-  meta: { color: '#64748B', marginTop: 4 },
+  cardTitle: { color: text.title, fontWeight: '700' },
+  meta: { color: text.muted, marginTop: 4 },
 });

@@ -13,6 +13,7 @@ public record MembershipResponse(
         LocalDate startDate,
         LocalDate endDate,
         BigDecimal totalPrice,
+        BigDecimal discountAmount,
         String status,
         Instant createdAt
 ) {

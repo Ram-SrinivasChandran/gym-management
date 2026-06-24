@@ -4,6 +4,7 @@ import { ActivityIndicator, FAB, Searchbar, Text } from 'react-native-paper';
 import GradientHeader from '../../components/GradientHeader';
 import GlassCard from '../../components/GlassCard';
 import { useMembersSearch } from '../../features/members/useMembers';
+import { text } from '../../theme/colors';
 
 export default function MembersListScreen({ navigation }) {
   const [search, setSearch] = useState('');
@@ -37,7 +38,7 @@ export default function MembersListScreen({ navigation }) {
               onPress={() => navigation.navigate('MemberDetail', { memberId: item.id })}
               testID={`member-card-${item.id}`}
             >
-              <Text variant="titleMedium">{item.fullName}</Text>
+              <Text variant="titleMedium" style={styles.cardTitle}>{item.fullName}</Text>
               <Text style={styles.meta}>
                 {item.memberCode} · {item.phone}
               </Text>
@@ -62,7 +63,8 @@ const styles = StyleSheet.create({
   searchWrap: { paddingHorizontal: 16, marginTop: -20 },
   listContent: { padding: 16, paddingBottom: 96 },
   card: { marginBottom: 12 },
-  meta: { color: '#64748B', marginTop: 4 },
+  cardTitle: { color: text.title, fontWeight: '700' },
+  meta: { color: text.muted, marginTop: 4 },
   centered: { textAlign: 'center', marginTop: 40 },
   fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#DC2626' },
 });

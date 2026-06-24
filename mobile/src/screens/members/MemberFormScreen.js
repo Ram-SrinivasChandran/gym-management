@@ -1,16 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 import { z } from 'zod';
+import AppTextInput from '../../components/AppTextInput';
 import GradientHeader from '../../components/GradientHeader';
-import InlineSelect from '../../components/InlineSelect';
 import { useBranches } from '../../features/branches/useBranches';
 import { useCreateMember } from '../../features/members/useMembers';
 
 const memberSchema = z.object({
-  branchId: z.string().min(1, 'Select a branch'),
+  admissionNumber: z.string().min(1, 'Admission number is required'),
   fullName: z.string().min(1, 'Full name is required'),
   phone: z.string().min(1, 'Phone is required'),
   email: z.union([z.string().email('Enter a valid email'), z.literal('')]).optional(),
@@ -22,26 +21,26 @@ const memberSchema = z.object({
 export default function MemberFormScreen({ navigation }) {
   const { data: branches } = useBranches();
   const createMember = useCreateMember();
-  const [branchPickerOpen, setBranchPickerOpen] = useState(false);
 
   const {
     control,
     handleSubmit,
-    setValue,
-    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(memberSchema),
-    defaultValues: { branchId: '', fullName: '', phone: '', email: '', heightCm: '', weightKg: '', fitnessGoal: '' },
+    defaultValues: { admissionNumber: '', fullName: '', phone: '', email: '', heightCm: '', weightKg: '', fitnessGoal: '' },
   });
 
-  const selectedBranchId = watch('branchId');
-  const selectedBranch = branches?.find((b) => b.id === selectedBranchId);
-
   const onSubmit = (values) => {
+    // Single-branch gym: members are assigned to the only branch automatically.
+    const branchId = branches?.[0]?.id;
+    if (!branchId) {
+      return;
+    }
     createMember.mutate(
       {
-        branchId: values.branchId,
+        branchId,
+        admissionNumber: values.admissionNumber,
         fullName: values.fullName,
         phone: values.phone,
         email: values.email || undefined,
@@ -57,25 +56,26 @@ export default function MemberFormScreen({ navigation }) {
     <ScrollView style={styles.flex}>
       <GradientHeader title="New Member" subtitle="Add a member profile" />
       <View style={styles.form}>
-        <InlineSelect
-          testID="branch-picker"
-          placeholder="Select branch"
-          selectedLabel={selectedBranch?.name}
-          open={branchPickerOpen}
-          onToggle={() => setBranchPickerOpen((prev) => !prev)}
-          options={(branches ?? []).map((branch) => ({ id: branch.id, label: branch.name }))}
-          onSelect={(option) => {
-            setValue('branchId', option.id);
-            setBranchPickerOpen(false);
-          }}
+        <Controller
+          control={control}
+          name="admissionNumber"
+          render={({ field }) => (
+            <AppTextInput
+              label="Admission Number"
+              value={field.value}
+              onChangeText={field.onChange}
+              style={styles.input}
+              testID="member-admission-input"
+            />
+          )}
         />
-        {errors.branchId ? <Text style={styles.errorText}>{errors.branchId.message}</Text> : null}
+        {errors.admissionNumber ? <Text style={styles.errorText}>{errors.admissionNumber.message}</Text> : null}
 
         <Controller
           control={control}
           name="fullName"
           render={({ field }) => (
-            <TextInput
+            <AppTextInput
               label="Full Name"
               value={field.value}
               onChangeText={field.onChange}
@@ -90,7 +90,7 @@ export default function MemberFormScreen({ navigation }) {
           control={control}
           name="phone"
           render={({ field }) => (
-            <TextInput
+            <AppTextInput
               label="Phone"
               keyboardType="phone-pad"
               value={field.value}
@@ -106,7 +106,7 @@ export default function MemberFormScreen({ navigation }) {
           control={control}
           name="email"
           render={({ field }) => (
-            <TextInput
+            <AppTextInput
               label="Email (optional)"
               autoCapitalize="none"
               keyboardType="email-address"
@@ -124,7 +124,7 @@ export default function MemberFormScreen({ navigation }) {
             control={control}
             name="heightCm"
             render={({ field }) => (
-              <TextInput
+              <AppTextInput
                 label="Height (cm)"
                 keyboardType="numeric"
                 value={field.value}
@@ -138,7 +138,7 @@ export default function MemberFormScreen({ navigation }) {
             control={control}
             name="weightKg"
             render={({ field }) => (
-              <TextInput
+              <AppTextInput
                 label="Weight (kg)"
                 keyboardType="numeric"
                 value={field.value}
@@ -154,7 +154,7 @@ export default function MemberFormScreen({ navigation }) {
           control={control}
           name="fitnessGoal"
           render={({ field }) => (
-            <TextInput
+            <AppTextInput
               label="Fitness Goal (optional)"
               value={field.value}
               onChangeText={field.onChange}

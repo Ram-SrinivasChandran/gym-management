@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
+import AppTextInput from '../../components/AppTextInput';
 import { z } from 'zod';
 import { useLogin } from '../../features/auth/useAuth';
 
@@ -15,6 +16,8 @@ const loginSchema = z.object({
 
 export default function LoginScreen() {
   const [serverError, setServerError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgotHelp, setShowForgotHelp] = useState(false);
   const login = useLogin();
 
   const {
@@ -41,7 +44,7 @@ export default function LoginScreen() {
           control={control}
           name="email"
           render={({ field }) => (
-            <TextInput
+            <AppTextInput
               label="Email"
               autoCapitalize="none"
               keyboardType="email-address"
@@ -59,14 +62,22 @@ export default function LoginScreen() {
           control={control}
           name="password"
           render={({ field }) => (
-            <TextInput
+            <AppTextInput
               label="Password"
-              secureTextEntry
+              secureTextEntry={!showPassword}
               value={field.value}
               onChangeText={field.onChange}
               error={Boolean(errors.password)}
               style={styles.input}
               testID="login-password-input"
+              right={
+                <TextInput.Icon
+                  icon={showPassword ? 'eye-off' : 'eye'}
+                  onPress={() => setShowPassword((prev) => !prev)}
+                  forceTextInputFocus={false}
+                  testID="login-password-toggle"
+                />
+              }
             />
           )}
         />
@@ -86,6 +97,21 @@ export default function LoginScreen() {
         >
           Sign In
         </Button>
+
+        <Button
+          mode="text"
+          onPress={() => setShowForgotHelp((prev) => !prev)}
+          textColor="#DC2626"
+          style={styles.forgotButton}
+          testID="forgot-password-button"
+        >
+          Forgot Password?
+        </Button>
+        {showForgotHelp ? (
+          <Text style={styles.forgotHelp} testID="forgot-password-help">
+            Please contact your gym admin to reset your password.
+          </Text>
+        ) : null}
       </View>
     </KeyboardAvoidingView>
   );
@@ -98,4 +124,6 @@ const styles = StyleSheet.create({
   input: { marginTop: 16, backgroundColor: '#FFFFFF' },
   errorText: { color: '#EF4444', marginTop: 4, fontSize: 12 },
   submitButton: { marginTop: 24, borderRadius: 10 },
+  forgotButton: { marginTop: 8 },
+  forgotHelp: { color: '#475569', textAlign: 'center', marginTop: 4, fontSize: 13 },
 });

@@ -11,6 +11,7 @@ public record PlanResponse(
         String planType,
         Integer durationDays,
         BigDecimal price,
+        BigDecimal discountAmount,
         String benefits,
         String status,
         Instant createdAt

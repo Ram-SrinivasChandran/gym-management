@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Button, SegmentedButtons, Text, TextInput } from 'react-native-paper';
+import { Button, SegmentedButtons, Text } from 'react-native-paper';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import AppTextInput from '../../components/AppTextInput';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import { apiClient } from '../../api/client';
 import { useBranches } from '../../features/branches/useBranches';
+import { text } from '../../theme/colors';
 
 const ROLES = [
   { value: 'GYM_ADMIN', label: 'Admin' },
@@ -58,8 +60,8 @@ export default function StaffScreen() {
         <View>
           <GradientHeader title="Staff Accounts" subtitle={`${staff?.length ?? 0} staff members`} />
           <View style={styles.form}>
-            <TextInput label="Full Name" value={fullName} onChangeText={setFullName} style={styles.input} />
-            <TextInput
+            <AppTextInput label="Full Name" value={fullName} onChangeText={setFullName} style={styles.input} />
+            <AppTextInput
               label="Email"
               autoCapitalize="none"
               keyboardType="email-address"
@@ -67,7 +69,7 @@ export default function StaffScreen() {
               onChangeText={setEmail}
               style={styles.input}
             />
-            <TextInput
+            <AppTextInput
               label="Temporary Password"
               secureTextEntry
               value={password}
@@ -85,7 +87,7 @@ export default function StaffScreen() {
       contentContainerStyle={styles.listContent}
       renderItem={({ item }) => (
         <GlassCard style={styles.card}>
-          <Text variant="titleMedium">{item.fullName}</Text>
+          <Text variant="titleMedium" style={styles.cardTitle}>{item.fullName}</Text>
           <Text style={styles.meta}>
             {item.role} · {item.email}
           </Text>
@@ -104,5 +106,6 @@ const styles = StyleSheet.create({
   submitButton: { marginTop: 16, borderRadius: 10 },
   listContent: { paddingHorizontal: 16, paddingBottom: 24 },
   card: { marginBottom: 12 },
-  meta: { color: '#64748B', marginTop: 4 },
+  cardTitle: { color: text.title, fontWeight: '700' },
+  meta: { color: text.muted, marginTop: 4 },
 });

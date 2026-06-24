@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Button, SegmentedButtons, Text, TextInput } from 'react-native-paper';
+import { Button, SegmentedButtons, Text } from 'react-native-paper';
+import AppTextInput from '../../components/AppTextInput';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { apiClient } from '../../api/client';
 import { usePlans } from '../../features/memberships/useMemberships';
+import { text } from '../../theme/colors';
 import { formatCurrency } from '../../utils/format';
 
 const PLAN_TYPES = [
@@ -22,6 +24,7 @@ export default function PlansScreen() {
   const [planType, setPlanType] = useState('MONTHLY');
   const [durationDays, setDurationDays] = useState('30');
   const [price, setPrice] = useState('');
+  const [discount, setDiscount] = useState('');
   const [error, setError] = useState(null);
 
   const createPlan = useMutation({
@@ -30,6 +33,7 @@ export default function PlansScreen() {
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       setName('');
       setPrice('');
+      setDiscount('');
     },
   });
 
@@ -40,7 +44,13 @@ export default function PlansScreen() {
     }
     setError(null);
     createPlan.mutate(
-      { name, planType, durationDays: Number(durationDays), price: Number(price) },
+      {
+        name,
+        planType,
+        durationDays: Number(durationDays),
+        price: Number(price),
+        discountAmount: discount ? Number(discount) : 0,
+      },
       { onError: (err) => setError(err.response?.data?.message ?? 'Failed to create plan') }
     );
   };
@@ -54,7 +64,7 @@ export default function PlansScreen() {
         <View>
           <GradientHeader title="Membership Plans" subtitle={isLoading ? 'Loading…' : `${plans?.length ?? 0} plans`} />
           <View style={styles.form}>
-            <TextInput
+            <AppTextInput
               label="Plan Name"
               value={name}
               onChangeText={setName}
@@ -63,7 +73,7 @@ export default function PlansScreen() {
             />
             <SegmentedButtons value={planType} onValueChange={setPlanType} buttons={PLAN_TYPES} style={styles.segmented} />
             <View style={styles.row}>
-              <TextInput
+              <AppTextInput
                 label="Duration (days)"
                 keyboardType="numeric"
                 value={durationDays}
@@ -71,7 +81,7 @@ export default function PlansScreen() {
                 style={[styles.input, styles.halfInput]}
                 testID="plan-duration-input"
               />
-              <TextInput
+              <AppTextInput
                 label="Price"
                 keyboardType="numeric"
                 value={price}
@@ -80,6 +90,14 @@ export default function PlansScreen() {
                 testID="plan-price-input"
               />
             </View>
+            <AppTextInput
+              label="Discount (₹)"
+              keyboardType="numeric"
+              value={discount}
+              onChangeText={setDiscount}
+              style={styles.input}
+              testID="plan-discount-input"
+            />
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <Button
               mode="contained"
@@ -96,9 +114,10 @@ export default function PlansScreen() {
       contentContainerStyle={styles.listContent}
       renderItem={({ item }) => (
         <GlassCard style={styles.card}>
-          <Text variant="titleMedium">{item.name}</Text>
+          <Text variant="titleMedium" style={styles.cardTitle}>{item.name}</Text>
           <Text style={styles.meta}>
             {item.planType} · {item.durationDays} days · {formatCurrency(item.price)}
+            {item.discountAmount > 0 ? ` · ${formatCurrency(item.discountAmount)} off` : ''}
           </Text>
         </GlassCard>
       )}
@@ -117,5 +136,6 @@ const styles = StyleSheet.create({
   submitButton: { marginTop: 16, borderRadius: 10 },
   listContent: { paddingHorizontal: 16, paddingBottom: 24 },
   card: { marginBottom: 12 },
-  meta: { color: '#64748B', marginTop: 4 },
+  cardTitle: { color: text.title, fontWeight: '700' },
+  meta: { color: text.muted, marginTop: 4 },
 });

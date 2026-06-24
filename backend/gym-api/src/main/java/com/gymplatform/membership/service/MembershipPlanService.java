@@ -8,6 +8,7 @@ import com.gymplatform.membership.dto.PlanRequest;
 import com.gymplatform.membership.dto.PlanResponse;
 import com.gymplatform.membership.mapper.MembershipPlanMapper;
 import com.gymplatform.membership.repository.MembershipPlanRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class MembershipPlanService {
                 .planType(request.planType())
                 .durationDays(request.durationDays())
                 .price(request.price())
+                .discountAmount(discountOrZero(request))
                 .benefits(request.benefits())
                 .build();
         return planMapper.toResponse(planRepository.save(plan));
@@ -56,8 +58,13 @@ public class MembershipPlanService {
         plan.setPlanType(request.planType());
         plan.setDurationDays(request.durationDays());
         plan.setPrice(request.price());
+        plan.setDiscountAmount(discountOrZero(request));
         plan.setBenefits(request.benefits());
         return planMapper.toResponse(planRepository.save(plan));
+    }
+
+    private static BigDecimal discountOrZero(PlanRequest request) {
+        return request.discountAmount() != null ? request.discountAmount() : BigDecimal.ZERO;
     }
 
     @Transactional

@@ -14,6 +14,7 @@ import com.gymplatform.membership.repository.MembershipPlanRepository;
 import com.gymplatform.membership.repository.MembershipRepository;
 import com.gymplatform.payment.repository.PaymentRepository;
 import com.gymplatform.payment.service.DueCacheService;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -59,12 +60,14 @@ public class MembershipService {
                     "Member already has an active membership (id=" + existing.getId() + "); renew it instead");
         });
 
+        BigDecimal discount = resolveDiscount(request.discountAmount(), plan);
         Membership membership = Membership.builder()
                 .memberId(request.memberId())
                 .planId(plan.getId())
                 .startDate(request.startDate())
                 .endDate(request.startDate().plusDays(plan.getDurationDays()))
-                .totalPrice(plan.getPrice())
+                .discountAmount(discount)
+                .totalPrice(plan.getPrice().subtract(discount))
                 .build();
         membership = membershipRepository.save(membership);
         dueCacheService.refresh(membership, Collections.emptyList());
@@ -80,13 +83,15 @@ public class MembershipService {
         MembershipPlan plan = planRepository.findByIdAndGymId(newPlanId, gymId)
                 .orElseThrow(() -> new ResourceNotFoundException("MembershipPlan", newPlanId));
 
+        BigDecimal discount = resolveDiscount(null, plan);
         Membership renewed = Membership.builder()
                 .memberId(previous.getMemberId())
                 .planId(plan.getId())
                 .renewedFromId(previous.getId())
                 .startDate(previous.getEndDate())
                 .endDate(previous.getEndDate().plusDays(plan.getDurationDays()))
-                .totalPrice(plan.getPrice())
+                .discountAmount(discount)
+                .totalPrice(plan.getPrice().subtract(discount))
                 .build();
         renewed = membershipRepository.save(renewed);
 
@@ -96,6 +101,18 @@ public class MembershipService {
         dueCacheService.refresh(renewed, Collections.emptyList());
 
         return membershipMapper.toResponse(renewed);
+    }
+
+    /**
+     * Resolves the discount to apply: the explicit request value when given, otherwise the plan's
+     * own discount. Never negative and never more than the plan price (so total_price stays >= 0).
+     */
+    private static BigDecimal resolveDiscount(BigDecimal requested, MembershipPlan plan) {
+        BigDecimal discount = requested != null ? requested : plan.getDiscountAmount();
+        if (discount == null || discount.signum() < 0) {
+            discount = BigDecimal.ZERO;
+        }
+        return discount.min(plan.getPrice());
     }
 
     public List<MembershipResponse> getMembershipHistory(UUID memberId) {

@@ -19,7 +19,14 @@
       "Bash(python3 -c \"import PIL; print\\('Pillow', PIL.__version__\\)\")",
       "Bash(node -e \"require\\('sharp'\\); console.log\\('sharp ok'\\)\")",
       "Bash(python3 -)",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "Read(//c/Users/Akash/AppData/Local/Android/Sdk/**)",
+      "Read(//c/Users/Akash/AppData/Local/Android/Sdk/platform-tools/**)",
+      "Read(//c/Users/Akash/AppData/Local/Android/Sdk/emulator/**)",
+      "Bash(\"/c/Users/Akash/AppData/Local/Android/Sdk/emulator/emulator.exe\" -list-avds)",
+      "Bash(\"/c/Users/Akash/AppData/Local/Android/Sdk/emulator/emulator.exe\" -avd Pixel_6_API_34)",
+      "Bash(echo \"launched, pid $!\")",
+      "Bash(\"/c/Users/Akash/AppData/Local/Android/Sdk/platform-tools/adb.exe\" wait-for-device *)"
     ]
   }
 }
