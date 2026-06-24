@@ -4,7 +4,9 @@ import { supabase } from './supabase';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  // Generous timeout: the free Render backend cold-starts (~50s) after idle, so the first
+  // request must tolerate the wake-up before the service responds.
+  timeout: 60000,
 });
 
 // Attach the current Supabase access token to every request. getSession() returns the
