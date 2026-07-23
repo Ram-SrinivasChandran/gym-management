@@ -1,12 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { z } from 'zod';
 import AppTextInput from '../../components/AppTextInput';
 import GradientHeader from '../../components/GradientHeader';
+import MemberAvatarPicker from '../../components/MemberAvatarPicker';
+import { uploadMemberPhoto } from '../../api/storage';
+import { updateMember } from '../../features/members/api';
 import { useBranches } from '../../features/branches/useBranches';
 import { useCreateMember } from '../../features/members/useMembers';
+import { useToastStore } from '../../store/toastStore';
 
 const memberSchema = z.object({
   admissionNumber: z.string().min(1, 'Admission number is required'),
@@ -21,6 +26,9 @@ const memberSchema = z.object({
 export default function MemberFormScreen({ navigation }) {
   const { data: branches } = useBranches();
   const createMember = useCreateMember();
+  const showToast = useToastStore((state) => state.showToast);
+  const [photoAsset, setPhotoAsset] = useState(null);
+  const [savingPhoto, setSavingPhoto] = useState(false);
 
   const {
     control,
@@ -31,14 +39,14 @@ export default function MemberFormScreen({ navigation }) {
     defaultValues: { admissionNumber: '', fullName: '', phone: '', email: '', heightCm: '', weightKg: '', fitnessGoal: '' },
   });
 
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     // Single-branch gym: members are assigned to the only branch automatically.
     const branchId = branches?.[0]?.id;
     if (!branchId) {
       return;
     }
-    createMember.mutate(
-      {
+    try {
+      const created = await createMember.mutateAsync({
         branchId,
         admissionNumber: values.admissionNumber,
         fullName: values.fullName,
@@ -47,15 +55,38 @@ export default function MemberFormScreen({ navigation }) {
         heightCm: values.heightCm ? Number(values.heightCm) : undefined,
         weightKg: values.weightKg ? Number(values.weightKg) : undefined,
         fitnessGoal: values.fitnessGoal || undefined,
-      },
-      { onSuccess: () => navigation.goBack() }
-    );
+      });
+
+      // Photo upload happens after the member exists so the storage path is keyed by the
+      // real member id. A failure here shouldn't block the member record from being saved —
+      // the admin can add the photo later from the member's detail screen.
+      if (photoAsset) {
+        setSavingPhoto(true);
+        try {
+          const photoUrl = await uploadMemberPhoto(created.id, photoAsset);
+          await updateMember(created.id, { profilePhotoUrl: photoUrl });
+        } catch {
+          showToast('Member saved, but the photo upload failed. Add it again from the member profile.');
+        } finally {
+          setSavingPhoto(false);
+        }
+      }
+      navigation.goBack();
+    } catch {
+      showToast('Failed to save member. Please try again.');
+    }
   };
 
   return (
     <ScrollView style={styles.flex}>
       <GradientHeader title="New Member" subtitle="Add a member profile" />
       <View style={styles.form}>
+        <MemberAvatarPicker
+          uri={photoAsset?.uri}
+          onPick={setPhotoAsset}
+          testID="member-photo-picker"
+        />
+
         <Controller
           control={control}
           name="admissionNumber"
@@ -166,8 +197,8 @@ export default function MemberFormScreen({ navigation }) {
         <Button
           mode="contained"
           onPress={handleSubmit(onSubmit)}
-          loading={createMember.isPending}
-          disabled={createMember.isPending}
+          loading={createMember.isPending || savingPhoto}
+          disabled={createMember.isPending || savingPhoto}
           style={styles.submitButton}
           testID="save-member-button"
         >

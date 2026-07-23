@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, FAB, Searchbar, Text } from 'react-native-paper';
+import { ActivityIndicator, Avatar, FAB, Searchbar, Text } from 'react-native-paper';
 import GradientHeader from '../../components/GradientHeader';
 import GlassCard from '../../components/GlassCard';
 import { useMembersSearch } from '../../features/members/useMembers';
@@ -38,10 +38,19 @@ export default function MembersListScreen({ navigation }) {
               onPress={() => navigation.navigate('MemberDetail', { memberId: item.id })}
               testID={`member-card-${item.id}`}
             >
-              <Text variant="titleMedium" style={styles.cardTitle}>{item.fullName}</Text>
-              <Text style={styles.meta}>
-                {item.memberCode} · {item.phone}
-              </Text>
+              <View style={styles.cardRow}>
+                {item.profilePhotoUrl ? (
+                  <Avatar.Image size={40} source={{ uri: item.profilePhotoUrl }} style={styles.avatar} />
+                ) : (
+                  <Avatar.Icon size={40} icon="account" style={styles.avatar} color="#FFFFFF" />
+                )}
+                <View style={styles.cardTextWrap}>
+                  <Text variant="titleMedium" style={styles.cardTitle}>{item.fullName}</Text>
+                  <Text style={styles.meta}>
+                    {item.memberCode} · {item.phone}
+                  </Text>
+                </View>
+              </View>
             </GlassCard>
           )}
           ListEmptyComponent={<Text style={styles.centered}>No members found.</Text>}
@@ -63,6 +72,9 @@ const styles = StyleSheet.create({
   searchWrap: { paddingHorizontal: 16, marginTop: -20 },
   listContent: { padding: 16, paddingBottom: 96 },
   card: { marginBottom: 12 },
+  cardRow: { flexDirection: 'row', alignItems: 'center' },
+  avatar: { backgroundColor: '#94A3B8' },
+  cardTextWrap: { marginLeft: 12, flexShrink: 1 },
   cardTitle: { color: text.title, fontWeight: '700' },
   meta: { color: text.muted, marginTop: 4 },
   centered: { textAlign: 'center', marginTop: 40 },

@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
+import MemberAvatarPicker from '../../components/MemberAvatarPicker';
 import StatusBadge from '../../components/StatusBadge';
+import { uploadMemberPhoto } from '../../api/storage';
 import { text } from '../../theme/colors';
-import { useMember } from '../../features/members/useMembers';
+import { useMember, useUpdateMember } from '../../features/members/useMembers';
 import { useMembershipHistory } from '../../features/memberships/useMemberships';
 import { useDueStatus } from '../../features/payments/usePayments';
+import { useToastStore } from '../../store/toastStore';
 import { formatCurrency, formatDate } from '../../utils/format';
 
 export default function MemberDetailScreen({ route, navigation }) {
@@ -15,6 +19,22 @@ export default function MemberDetailScreen({ route, navigation }) {
   const { data: history } = useMembershipHistory(memberId);
   const currentMembership = history?.[0];
   const { data: due } = useDueStatus(currentMembership?.id);
+  const updateMember = useUpdateMember(memberId);
+  const showToast = useToastStore((state) => state.showToast);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const onPickPhoto = async (asset) => {
+    setUploadingPhoto(true);
+    try {
+      const photoUrl = await uploadMemberPhoto(memberId, asset);
+      await updateMember.mutateAsync({ profilePhotoUrl: photoUrl });
+      showToast('Photo updated.');
+    } catch {
+      showToast('Failed to upload photo. Please try again.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   if (isLoading || !member) {
     return <ActivityIndicator style={styles.centered} size="large" />;
@@ -26,6 +46,12 @@ export default function MemberDetailScreen({ route, navigation }) {
 
       <View style={styles.section}>
         <GlassCard>
+          <MemberAvatarPicker
+            uri={member.profilePhotoUrl}
+            onPick={onPickPhoto}
+            testID="member-detail-photo-picker"
+          />
+          {uploadingPhoto ? <ActivityIndicator style={styles.photoSpinner} /> : null}
           <Text variant="titleMedium" style={styles.cardTitle}>Profile</Text>
           <Text style={styles.detailRow}>Admission No: {member.admissionNumber ?? '-'}</Text>
           <Text style={styles.detailRow}>Email: {member.email ?? '-'}</Text>
@@ -96,6 +122,7 @@ const styles = StyleSheet.create({
   cardSpacing: { marginTop: 16 },
   cardTitle: { color: text.title, fontWeight: '700' },
   detailRow: { marginTop: 6, color: text.secondary },
+  photoSpinner: { marginTop: -8, marginBottom: 8 },
   badgeRow: { marginTop: 8, marginBottom: 4 },
   actionButton: { marginTop: 12, borderRadius: 10 },
 });

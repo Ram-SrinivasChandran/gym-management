@@ -25,10 +25,21 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Red Fitness to access your photos to set a member's profile picture.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "extra": {
-      "apiBaseUrl": "https://gym-api-djws.onrender.com/api/v1"
+      "apiBaseUrl": "https://gym-api-djws.onrender.com/api/v1",
+      "eas": {
+        "projectId": "147ee6f0-d114-4bbb-947e-30d3b81ed278"
+      }
     }
   }
 }
