@@ -8,7 +8,6 @@ import AppTextInput from '../../components/AppTextInput';
 import GradientHeader from '../../components/GradientHeader';
 import MemberAvatarPicker from '../../components/MemberAvatarPicker';
 import { uploadMemberPhoto } from '../../api/storage';
-import { updateMember } from '../../features/members/api';
 import { useBranches } from '../../features/branches/useBranches';
 import { useCreateMember } from '../../features/members/useMembers';
 import { useToastStore } from '../../store/toastStore';
@@ -63,8 +62,7 @@ export default function MemberFormScreen({ navigation }) {
       if (photoAsset) {
         setSavingPhoto(true);
         try {
-          const photoUrl = await uploadMemberPhoto(created.id, photoAsset);
-          await updateMember(created.id, { profilePhotoUrl: photoUrl });
+          await uploadMemberPhoto(created.id, photoAsset);
         } catch {
           showToast('Member saved, but the photo upload failed. Add it again from the member profile.');
         } finally {

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Button, Text } from 'react-native-paper';
+import { useQueryClient } from '@tanstack/react-query';
 import GlassCard from '../../components/GlassCard';
 import GradientHeader from '../../components/GradientHeader';
 import MemberAvatarPicker from '../../components/MemberAvatarPicker';
 import StatusBadge from '../../components/StatusBadge';
 import { uploadMemberPhoto } from '../../api/storage';
 import { text } from '../../theme/colors';
-import { useMember, useUpdateMember } from '../../features/members/useMembers';
+import { useMember } from '../../features/members/useMembers';
 import { useMembershipHistory } from '../../features/memberships/useMemberships';
 import { useDueStatus } from '../../features/payments/usePayments';
 import { useToastStore } from '../../store/toastStore';
@@ -19,15 +20,16 @@ export default function MemberDetailScreen({ route, navigation }) {
   const { data: history } = useMembershipHistory(memberId);
   const currentMembership = history?.[0];
   const { data: due } = useDueStatus(currentMembership?.id);
-  const updateMember = useUpdateMember(memberId);
+  const queryClient = useQueryClient();
   const showToast = useToastStore((state) => state.showToast);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const onPickPhoto = async (asset) => {
     setUploadingPhoto(true);
     try {
-      const photoUrl = await uploadMemberPhoto(memberId, asset);
-      await updateMember.mutateAsync({ profilePhotoUrl: photoUrl });
+      await uploadMemberPhoto(memberId, asset);
+      queryClient.invalidateQueries({ queryKey: ['members', memberId] });
+      queryClient.invalidateQueries({ queryKey: ['members', 'search'] });
       showToast('Photo updated.');
     } catch {
       showToast('Failed to upload photo. Please try again.');

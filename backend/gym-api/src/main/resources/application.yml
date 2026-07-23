@@ -1,6 +1,10 @@
 spring:
   application:
     name: gym-api
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 8MB
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/gymdb}
     username: ${DB_USERNAME:gymadmin}
@@ -51,6 +55,13 @@ supabase:
   jwt:
     issuer: ${supabase.url}/auth/v1
     jwk-set-uri: ${supabase.url}/auth/v1/.well-known/jwks.json
+  storage:
+    # service_role key: bypasses Storage RLS. Uploads are proxied through this backend
+    # (rather than the mobile app writing to Supabase Storage directly) because the
+    # client-side RLS path was unreliable for this project. Server-side only, never shipped
+    # to the mobile app.
+    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
+    member-photos-bucket: member-photos
 
 logging:
   level:

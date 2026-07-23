@@ -1,30 +1,23 @@
-import { File } from 'expo-file-system';
-import { decode } from 'base64-arraybuffer';
-import { supabase } from './supabase';
-
-const MEMBER_PHOTOS_BUCKET = 'member-photos';
+import { apiClient } from './client';
 
 /**
- * Uploads a picked image (a local file:// URI from expo-image-picker) to the
- * `member-photos` Supabase Storage bucket and returns its public URL. The path is namespaced
- * by memberId with a timestamp suffix so re-uploads don't collide with (or get served stale
- * via CDN cache from) the previous photo.
+ * Uploads a picked image (a local file:// URI from expo-image-picker) as the member's profile
+ * photo. This goes through our own backend rather than Supabase Storage directly — the
+ * client-side Storage upload (user JWT + RLS policies) proved unreliable for this project, so
+ * the backend proxies the write using its service_role key instead. Returns the updated member.
  */
 export async function uploadMemberPhoto(memberId, asset) {
-  const extension = (asset.mimeType?.split('/')?.[1] || 'jpg').toLowerCase();
-  const path = `${memberId}/${Date.now()}.${extension}`;
+  const extension = (asset.mimeType?.split('/')?.[1] || 'jpeg').toLowerCase();
 
-  const file = new File(asset.uri);
-  const base64 = await file.base64();
+  const formData = new FormData();
+  formData.append('file', {
+    uri: asset.uri,
+    type: asset.mimeType || 'image/jpeg',
+    name: `photo.${extension}`,
+  });
 
-  const { error } = await supabase.storage
-    .from(MEMBER_PHOTOS_BUCKET)
-    .upload(path, decode(base64), {
-      contentType: asset.mimeType || 'image/jpeg',
-      upsert: true,
-    });
-  if (error) throw error;
-
-  const { data } = supabase.storage.from(MEMBER_PHOTOS_BUCKET).getPublicUrl(path);
-  return data.publicUrl;
+  const response = await apiClient.post(`/members/${memberId}/photo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 }

@@ -2,6 +2,7 @@ package com.gymplatform.member.service;
 
 import com.gymplatform.common.audit.Audited;
 import com.gymplatform.common.exception.ResourceNotFoundException;
+import com.gymplatform.common.storage.SupabaseStorageClient;
 import com.gymplatform.common.tenancy.TenantContextHolder;
 import com.gymplatform.member.domain.Member;
 import com.gymplatform.member.domain.MemberDocument;
@@ -23,13 +24,16 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberDocumentRepository documentRepository;
     private final MemberMapper memberMapper;
+    private final SupabaseStorageClient storageClient;
 
     public MemberService(MemberRepository memberRepository,
                           MemberDocumentRepository documentRepository,
-                          MemberMapper memberMapper) {
+                          MemberMapper memberMapper,
+                          SupabaseStorageClient storageClient) {
         this.memberRepository = memberRepository;
         this.documentRepository = documentRepository;
         this.memberMapper = memberMapper;
+        this.storageClient = storageClient;
     }
 
     @Transactional
@@ -94,6 +98,15 @@ public class MemberService {
 
     public MemberResponse getMember(UUID memberId) {
         return memberMapper.toResponse(findOwnedMemberOrThrow(memberId));
+    }
+
+    @Transactional
+    @Audited(action = "UPDATE", entityType = "MEMBER")
+    public MemberResponse uploadPhoto(UUID memberId, byte[] bytes, String contentType) {
+        Member member = findOwnedMemberOrThrow(memberId);
+        String photoUrl = storageClient.uploadMemberPhoto(memberId, bytes, contentType);
+        member.setProfilePhotoUrl(photoUrl);
+        return memberMapper.toResponse(memberRepository.save(member));
     }
 
     public Page<MemberResponse> searchMembers(UUID branchId, String search, Pageable pageable) {
