@@ -25,7 +25,8 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
               AND (:search IS NULL
                    OR LOWER(m.fullName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
                    OR m.phone LIKE CONCAT('%', CAST(:search AS string), '%')
-                   OR LOWER(m.memberCode) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
+                   OR LOWER(m.memberCode) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(m.admissionNumber) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
             """)
     Page<Member> search(@Param("gymId") UUID gymId,
                          @Param("branchId") UUID branchId,

@@ -42,7 +42,7 @@ export default function MemberDetailScreen({ route, navigation }) {
 
   return (
     <ScrollView style={styles.flex}>
-      <GradientHeader title={member.fullName} subtitle={`${member.memberCode} · ${member.phone}`} />
+      <GradientHeader title={member.fullName} subtitle={`${member.admissionNumber ?? '-'} · ${member.phone}`} />
 
       <View style={styles.section}>
         <GlassCard>

@@ -16,7 +16,7 @@ export default function MembersListScreen({ navigation }) {
       <GradientHeader title="Members" subtitle={`${data?.totalElements ?? 0} total`} />
       <View style={styles.searchWrap}>
         <Searchbar
-          placeholder="Search by name, phone, or member ID"
+          placeholder="Search by name, phone, or admission number"
           value={search}
           onChangeText={setSearch}
           testID="members-search-input"
@@ -47,7 +47,7 @@ export default function MembersListScreen({ navigation }) {
                 <View style={styles.cardTextWrap}>
                   <Text variant="titleMedium" style={styles.cardTitle}>{item.fullName}</Text>
                   <Text style={styles.meta}>
-                    {item.memberCode} · {item.phone}
+                    {item.admissionNumber ?? '-'} · {item.phone}
                   </Text>
                 </View>
               </View>
