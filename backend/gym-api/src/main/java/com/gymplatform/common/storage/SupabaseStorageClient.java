@@ -44,9 +44,10 @@ public class SupabaseStorageClient {
         String extension = extensionFor(contentType);
         String path = "%s/%d.%s".formatted(memberId, Instant.now().toEpochMilli(), extension);
 
+        String uploadUrl = "%s/storage/v1/object/%s/%s".formatted(supabaseUrl, bucket, path);
         try {
             restClient.post()
-                    .uri("{base}/storage/v1/object/{bucket}/{path}", supabaseUrl, bucket, path)
+                    .uri(uploadUrl)
                     .header("Authorization", "Bearer " + serviceRoleKey)
                     .header("apikey", serviceRoleKey)
                     .header("x-upsert", "true")
